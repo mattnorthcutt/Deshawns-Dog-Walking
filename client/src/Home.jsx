@@ -1,18 +1,31 @@
-import { getGreeting } from "./apiManager";
+import { getDogs } from "./apiManager";
 import { useEffect, useState } from "react";
+import DogCard from "./components/DogsCard";
 
 export default function Home() {
-  const [greeting, setGreeting] = useState({
-    message: "Not Connected to the API",
-  });
+  const [dogs, setDogs] = useState([]);
+
+  const getTheDogs = () => {
+    getDogs().then(setDogs)
+  }
 
   useEffect(() => {
-    getGreeting()
-      .then(setGreeting)
-      .catch(() => {
-        console.log("API not connected");
-      });
+    getTheDogs();
   }, []);
 
-  return <p>{greeting.message}</p>;
+  return (
+    <main style={{ padding: "1rem"}}>
+      <h2>All The Dogs</h2>
+      {dogs.length ? (
+        <div>
+          {dogs.map((dog) => (
+            <DogCard key={dog.id} dog={dog} />
+          ))}
+        </div>
+      ) : (
+        <p>No Dogs Yet</p>
+      )}
+    </main>
+  );
+
 }
