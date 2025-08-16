@@ -21,3 +21,14 @@ export const createDog = async (payload) => {
   });
   return res.json();
 }
+
+export const getCities = async () => {
+  const res = await fetch("/api/cities");
+  return res.json();
+}
+
+export const getWalkers = async (cityId) => {
+  const url = cityId ? `/api/walkers?cityId=${cityId}` : '/api/walkers';
+  const res = await fetch(url);
+  return res.json();
+};
