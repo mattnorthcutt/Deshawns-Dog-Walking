@@ -12,3 +12,12 @@ export const getADog = async (id) => {
   const res = await fetch(`/api/dogs/${id}`);
   return res.json();
 }
+
+export const createDog = async (payload) => {
+  const res = await fetch("/api/dogs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}
