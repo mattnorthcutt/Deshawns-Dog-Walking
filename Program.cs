@@ -109,6 +109,23 @@ app.MapGet("/api/cities", () =>
     return cities.Select(c => new CityDTO { Id = c.Id, Name = c.Name });
 });
 
+app.MapPost("/api/cities", (City city) =>
+{
+    if (string.IsNullOrWhiteSpace(city?.Name))
+    {
+        return Results.BadRequest();
+    }
+
+    city.Id = cities.Count > 0 ? cities.Max(c => c.Id) + 1 : 1;
+    cities.Add(city);
+
+    return Results.Created($"/api/cities/{city.Id}", new CityDTO
+    {
+        Id = city.Id,
+        Name = city.Name,
+    });
+});
+
 app.MapGet("/api/walkers", (int? cityId) =>
 {
     var results = cityId is null ? walkers : walkers.Where(w => walkerCities.Any(wc => wc.CityId == cityId.Value && wc.WalkerId == w.Id));
