@@ -209,5 +209,30 @@ app.MapPut("/api/walkers/{id:int}", (int id, UpdateWalkerRequest body) =>
     return Results.NoContent();
 });
 
+app.MapDelete("/api/dogs/{id:int}", (int id) =>
+{
+    var dog = dogs.FirstOrDefault(d => d.Id == id);
+    if (dog == null) return Results.NotFound();
+
+    dogs.Remove(dog);
+    return Results.NoContent();
+});
+
+app.MapDelete("/api/walkers/{id:int}", (int id) =>
+{
+    var walker = walkers.FirstOrDefault(w => w.Id == id);
+    if (walker == null) return Results.NotFound();
+
+    foreach (var d in dogs.Where(d => d.WalkerId == id))
+    {
+        d.WalkerId = null;
+    }
+
+    walkerCities.RemoveAll(wc => wc.WalkerId == id);
+
+    walkers.Remove(walker);
+    return Results.NoContent();
+});
+
 
 app.Run();

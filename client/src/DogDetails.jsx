@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { getADog } from "./apiManager";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { deleteDog, getADog } from "./apiManager";
 
 export default function DogDetails() {
   const { id } = useParams();
   const [dog, setDog] = useState(null);
+  const nav = useNavigate();
 
   useEffect(() => {
     getADog(id).then(setDog)
@@ -26,6 +27,12 @@ export default function DogDetails() {
         <p>
           <strong>Walker:</strong> {dog.walker ?? "Unassigned"}
         </p>
+        <button style={{ marginTop: 12 }}
+          onClick={async () => {await deleteDog(dog.id);
+            nav("/");
+          }}>
+          Remove Dog
+        </button>
       </div>
     </main>
   )

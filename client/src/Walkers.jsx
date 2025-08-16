@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCities, getWalkers } from "./apiManager";
+import { deleteDog, deleteWalker, getCities, getWalkers } from "./apiManager";
 import { Link } from "react-router-dom";
 
 export default function Walkers() {
@@ -41,6 +41,15 @@ export default function Walkers() {
           <Link to={`/walkers/${w.id}/edit`} className="btn btn-sm btn-secondary">
             Edit
           </Link>
+          <button
+            style={{ marginLeft: 8 }}
+            onClick={async () => {
+              await deleteWalker(w.id);
+              setWalkers(prev => prev.filter(x => x.id !== w.id));
+            }}
+          >
+            Remove
+          </button>
           </li>
         ))}
       </ul>
