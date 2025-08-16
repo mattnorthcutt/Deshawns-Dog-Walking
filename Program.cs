@@ -116,5 +116,45 @@ app.MapGet("/api/walkers", (int? cityId) =>
     return results.Select(w => new WalkerDTO { Id = w.Id, Name = w.Name });
 });
 
+app.MapGet("/api/walkers/{walkerId:int}/available-dogs", (int walkerId) =>
+{
+    var cityIds = walkerCities.Where(wc => wc.WalkerId == walkerId).Select(wc => wc.CityId).ToHashSet();
+
+    var dogsForWalker = dogs.Where(d => cityIds.Contains(d.CityId) && d.WalkerId != walkerId).Select(d =>
+        {
+            var city   = cities.FirstOrDefault(c => c.Id == d.CityId);
+            var walker = (d.WalkerId == null) ? null : walkers.FirstOrDefault(w => w.Id == d.WalkerId.Value);
+
+            return new DogDTO
+            {
+                Id = d.Id,
+                Name = d.Name,
+                City = city?.Name,        
+                Walker = walker?.Name           
+            };
+        }).ToList();
+
+    return Results.Ok(dogsForWalker);
+});
+
+app.MapPost("/api/walkers/{walkerId:int}/assign/{dogID:int}", (int walkerId, int dogId) =>
+{
+    Dog dog = dogs.FirstOrDefault(d => d.Id == dogId);
+    if (dog is null) return Results.NotFound();
+
+    var inCity = walkerCities.Any(wc => wc.WalkerId == walkerId && wc.CityId == dog.CityId);
+
+    dog.WalkerId = walkerId;
+
+    DogDTO newDogDTO = new DogDTO
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        City = cities.First(c => c.Id == dog.CityId).Name,
+        Walker = walkers.First(w => w.Id == walkerId).Name
+    };
+    return Results.Ok(newDogDTO);
+});
+
 
 app.Run();
