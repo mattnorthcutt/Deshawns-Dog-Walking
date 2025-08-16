@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using DeShawnsDogWalking.Models;
 using DeShawnsDogWalking.Models.DTOs;
 using Microsoft.Extensions.ObjectPool;
@@ -29,6 +30,14 @@ List<Dog> dogs = new List<Dog>
     new Dog { Id = 1, Name = "Bella", CityId = 1, WalkerId = null },
     new Dog { Id = 2, Name = "Max",   CityId = 2, WalkerId = 1 },
     new Dog { Id = 3, Name = "Daisy", CityId = 1, WalkerId = 2 }
+};
+
+List<WalkerCity> walkerCities = new List<WalkerCity>
+{
+    new WalkerCity { WalkerId = 1, CityId = 1 }, 
+    new WalkerCity { WalkerId = 1, CityId = 2 }, 
+    new WalkerCity { WalkerId = 2, CityId = 1 }, 
+    new WalkerCity { WalkerId = 2, CityId = 3 },
 };
 
 
@@ -93,6 +102,18 @@ app.MapPost("/api/dogs", (Dog newDog) =>
         City = city.Name,
         Walker = walker?.Name
     });
+});
+
+app.MapGet("/api/cities", () =>
+{
+    return cities.Select(c => new CityDTO { Id = c.Id, Name = c.Name });
+});
+
+app.MapGet("/api/walkers", (int? cityId) =>
+{
+    var results = cityId is null ? walkers : walkers.Where(w => walkerCities.Any(wc => wc.CityId == cityId.Value && wc.WalkerId == w.Id));
+
+    return results.Select(w => new WalkerDTO { Id = w.Id, Name = w.Name });
 });
 
 
