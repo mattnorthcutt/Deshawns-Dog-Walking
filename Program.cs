@@ -1,5 +1,6 @@
 using DeShawnsDogWalking.Models;
 using DeShawnsDogWalking.Models.DTOs;
+using Microsoft.Extensions.ObjectPool;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,25 @@ app.MapGet("/api/dogs", () =>
         City = cities.First(c => c.Id == d.CityId).Name,
         WalkerId = d.WalkerId,
         Walker = d.WalkerId is null ? null : walkers.First(w => w.Id == d.WalkerId).Name
+    });
+});
+
+app.MapGet("/api/dogs/{id}", (int id) =>
+{
+    Dog dog = dogs.FirstOrDefault(d => d.Id == id);
+    if (dog == null) return Results.NotFound();
+
+    City city = cities.FirstOrDefault(c => c.Id == dog.CityId);
+    Walker walker = walkers.FirstOrDefault(w => w.Id == dog.WalkerId);
+
+    return Results.Ok(new DogDTO
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        CityId = dog.CityId,
+        WalkerId = dog.WalkerId,
+        City = city?.Name,
+        Walker = walker?.Name
     });
 });
 
