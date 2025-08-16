@@ -38,6 +38,9 @@ export default function Walkers() {
         {walkers.map((w) => (
           <li key={w.id}>{w.name}
           <Link to={`/walkers/${w.id}/add-dog`}>Add Dog</Link>
+          <Link to={`/walkers/${w.id}/edit`} className="btn btn-sm btn-secondary">
+            Edit
+          </Link>
           </li>
         ))}
       </ul>

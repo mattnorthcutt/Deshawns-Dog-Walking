@@ -11,6 +11,7 @@ import Walkers from "./Walkers";
 import WalkerAssigning from "./components/WalkerAssigning";
 import Cities from "./Cities";
 import CityForm from "./components/CityForm";
+import WalkerEdit from "./components/WalkerEdit";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -24,6 +25,7 @@ root.render(
         <Route path="/walkers/:id/add-dog" element={<WalkerAssigning />} />
         <Route path="/cities" element={<Cities />} />
         <Route path="cities/new" element={<CityForm />} />
+        <Route path="/walkers/:id/edit" element={<WalkerEdit />} />
       </Route>
     </Routes>
   </BrowserRouter>,

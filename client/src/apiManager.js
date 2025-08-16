@@ -42,6 +42,27 @@ export const getWalkers = async (cityId) => {
   return res.json();
 };
 
+export const getWalker = async (id) => {
+  const res = await fetch(`/api/walkers/${id}`);
+  return res.json();
+};
+
+
+export const updateWalker = async (id, payload) => {
+  const res = await fetch(`/api/walkers/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(`Update failed (${res.status}): ${msg}`);
+  }
+  if (res.status === 204) return;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+};
+
 export const getEligibleDogsForWalker = async (walkerId) => {
   const res = await fetch(`/api/walkers/${walkerId}/available-dogs`);
   return res.json();

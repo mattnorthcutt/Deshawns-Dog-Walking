@@ -133,6 +133,21 @@ app.MapGet("/api/walkers", (int? cityId) =>
     return results.Select(w => new WalkerDTO { Id = w.Id, Name = w.Name });
 });
 
+app.MapGet("/api/walkers/{id:int}", (int id) =>
+{
+    var walker = walkers.FirstOrDefault(w => w.Id == id);
+    if (walker == null) return Results.NotFound();
+
+    var cityIds = walkerCities.Where(wc => wc.WalkerId == id).Select(wc => wc.CityId).ToList();
+
+    return Results.Ok(new WalkerDetailDTO
+    {
+        Id = walker.Id,
+        Name = walker.Name,
+        CityIds = cityIds
+    });
+});
+
 app.MapGet("/api/walkers/{walkerId:int}/available-dogs", (int walkerId) =>
 {
     var cityIds = walkerCities.Where(wc => wc.WalkerId == walkerId).Select(wc => wc.CityId).ToHashSet();
@@ -171,6 +186,27 @@ app.MapPost("/api/walkers/{walkerId:int}/assign/{dogID:int}", (int walkerId, int
         Walker = walkers.First(w => w.Id == walkerId).Name
     };
     return Results.Ok(newDogDTO);
+});
+
+app.MapPut("/api/walkers/{id:int}", (int id, UpdateWalkerRequest body) =>
+{
+    var walker = walkers.FirstOrDefault(w => w.Id == id);
+    if (walker == null) return Results.NotFound();
+
+    if (string.IsNullOrWhiteSpace(body?.Name)) return Results.BadRequest("Name required.");
+
+    walker.Name = body.Name.Trim();
+
+    walkerCities.RemoveAll(wc => wc.WalkerId == id);
+
+    var validCityIds = new HashSet<int>(cities.Select(c => c.Id));
+    foreach (var cid in body.CityIds.Distinct())
+    {
+        if (validCityIds.Contains(cid))
+            walkerCities.Add(new WalkerCity { WalkerId = id, CityId = cid });
+    }
+
+    return Results.NoContent();
 });
 
 
